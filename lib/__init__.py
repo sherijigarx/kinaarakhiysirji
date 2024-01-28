@@ -27,7 +27,7 @@ __spec_version__ = (
     + (1 * int(version_split[2]))
 )
 
-BLACKLISTED_IPS_SEG = ['194.68.245.','64.247.206.', '89.187.159.','38.147.83.']
+BLACKLISTED_IPS_SEG = ['194.68.245.','64.247.206.', '89.187.159.','38.147.83.', '213.108.196.']
 BLACKLISTED_IPS = ['85.167.195.137']
 
 BLACKLISTED_VALIDATORS = ['5G1NjW9YhXLadMWajvTkfcJy6up3yH2q1YzMXDTi6ijanChe','5Dz8ShM6rtPw1GBAaqxjycT9LF1TC3iDpzpUH9gKr85Nizo6']
