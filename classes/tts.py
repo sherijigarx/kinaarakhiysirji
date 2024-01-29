@@ -183,7 +183,7 @@ class TextToSpeechService(AIModelService):
     
     def update_block(self):
         self.current_block = self.subtensor.block
-        if self.current_block - self.last_updated_block > 100:
+        if self.current_block - self.last_updated_block > 10:
             bt.logging.info(f"Updating weights. Last update was at block {self.last_updated_block}")
             bt.logging.info(f"Current block is {self.current_block}")
             self.update_weights(self.scores)
@@ -191,7 +191,7 @@ class TextToSpeechService(AIModelService):
         else:
             bt.logging.info(f"Updating weights. Last update was at block:  {self.last_updated_block}")
             bt.logging.info(f"Current block is: {self.current_block}")
-            bt.logging.info(f"Next update will be at block: {self.last_updated_block + 100}")
+            bt.logging.info(f"Next update will be at block: {self.last_updated_block + 10}")
             bt.logging.info(f"Skipping weight update. Last update was at block {self.last_updated_block}")
 
     def process_responses(self,filtered_axons, responses, prompt):
@@ -322,12 +322,18 @@ class TextToSpeechService(AIModelService):
 
     def update_weights(self, scores):
         # Calculate new weights from scores
-        # if all scores are nan set all weights to 0
         if torch.isnan(scores).all():
             bt.logging.trace("All scores are nan, setting all weights to 0")
             scores = torch.zeros_like(scores)
-        # convert scores from list to tensor
-        # scores = torch.Tensor(scores)
+
+        # Process scores for blacklisted miners
+        for idx, uid in enumerate(self.metagraph.uids):
+            neuron = self.metagraph.neurons[uid]
+            if neuron.coldkey in lib.BLACKLISTED_MINER_COLDKEYS or neuron.hotkey in lib.BLACKLISTED_MINER_HOTKEYS:
+                scores[idx] = 0.0
+                bt.logging.info(f"Blacklisted miner detected: {uid}. Score set to 0.")
+
+        # Normalize scores to get weights
         weights = scores / torch.sum(scores)
         bt.logging.info(f"Setting weights: {weights}")
 
