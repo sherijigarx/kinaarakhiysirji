@@ -19,7 +19,7 @@
 
 # TODO(developer): Change this value when updating your code base.
 # Define the version of the lib module.
-__version__ = "2.0.3"
+__version__ = "2.0.y"
 version_split = __version__.split(".")
 __spec_version__ = (
     (1000 * int(version_split[0]))
@@ -30,8 +30,8 @@ __spec_version__ = (
 BLACKLISTED_IPS_SEG = ['194.68.245.','64.247.206.', '89.187.159.','38.147.83.']
 BLACKLISTED_IPS = ['85.167.195.137']
 
-BLACKLISTED_MINER_COLDKEYS = ['5DwKuRzn2phMDMiJYzUj9grk15sv8MtxgdTi18wy3BEv8Usd']
-BLACKLISTED_MINER_HOTKEYS = ['5EqhXVkq74vdV1a9ueNU4KQSWmEkacREXMFZQVyua8RYgL7f']
+BLACKLISTED_MINER_COLDKEYS = []
+BLACKLISTED_MINER_HOTKEYS = []
 
 BLACKLISTED_VALIDATORS = ['5G1NjW9YhXLadMWajvTkfcJy6up3yH2q1YzMXDTi6ijanChe','5Dz8ShM6rtPw1GBAaqxjycT9LF1TC3iDpzpUH9gKr85Nizo6']
 legit_validators = ['5F4tQyWrhfGVcNhoqeiNsR6KjD4wMZ2kfhLj4oHYuyHbZAc3', '5HTZipxVCMqzhLt9QKi2Nxj3Fd6TCSnzTjBKR3vtiuTkuq1B',
