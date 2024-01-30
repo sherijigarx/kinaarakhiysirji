@@ -548,7 +548,7 @@ def main(config):
             step += 1
             time.sleep(1)
 
-            if step % 1000 == 0:
+            if step % 500 == 0:
                 lib.utils.try_update()
 
         # If someone intentionally stops the miner, it'll safely terminate operations.
