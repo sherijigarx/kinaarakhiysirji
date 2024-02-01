@@ -116,7 +116,7 @@ class VoiceCloningService(AIModelService):
                 running_tasks = [task for task in running_tasks if not task.done()]
                 step += 1
 
-                if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
+                if step % 5:  # Assuming each loop is ~0.5 seconds, adjust as needed
                     outdated_miners = self.filtered_UIDs()
                     self.exclude_outdated_miners(outdated_miners)
 

@@ -106,7 +106,7 @@ class TextToSpeechService(AIModelService):
                 if step % 50 == 0:
                     lib.utils.try_update()
 
-                if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
+                if step % 5:  # Assuming each loop is ~0.5 seconds, adjust as needed
                     outdated_miners = self.filtered_UIDs()
                     self.exclude_outdated_miners(outdated_miners)
             except KeyboardInterrupt:
