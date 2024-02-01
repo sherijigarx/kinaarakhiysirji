@@ -38,7 +38,7 @@ class VoiceCloningService(AIModelService):
         self.minimum_dendrites_per_query = 5  # Example value, adjust as needed
         self.last_run_date = dt.date.today()
         self.tao = self.metagraph.neurons[self.uid].stake.tao
-        self.outdated_miners_set = set()
+        self.outdated_miners_set = []
 
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.source_path = os.path.join(audio_subnet_path, "vc_source")

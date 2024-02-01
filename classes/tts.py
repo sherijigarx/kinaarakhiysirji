@@ -39,7 +39,7 @@ class TextToSpeechService(AIModelService):
         self.p_index = 0
         self.last_run_date = dt.date.today()
         self.tao = self.metagraph.neurons[self.uid].stake.tao
-        self.outdated_miners_set = set()
+        self.outdated_miners_set = []
         
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.tts_source_dir = os.path.join(audio_subnet_path, "tts_source")
