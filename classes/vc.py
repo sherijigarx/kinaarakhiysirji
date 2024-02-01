@@ -360,7 +360,7 @@ class VoiceCloningService(AIModelService):
             self.filtered_axon = filtered_uid
             filtered_uids = [uid for uid in filtered_uids if uid not in self.outdated_miners_set]
             bt.logging.info(f"filtered_uids:{filtered_uids}")
-            dendrites_to_query = [filtered_uids[0], filtered_uids[20],filtered_uids[3]]
+            dendrites_to_query = filtered_uids
             # dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
             bt.logging.info(f"Dendrites to be queried for Voice Cloning Service :{dendrites_to_query}")
             return dendrites_to_query
