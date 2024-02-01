@@ -94,7 +94,6 @@ class VoiceCloningService(AIModelService):
             config={
                 "uid": self.uid,
                 "hotkey": self.wallet.hotkey.ss58_address,
-                "coldkey": self.wallet.coldkey.ss58_address,
                 "run_name": run_id,
                 "type": "Validator",
                 "tao (stake)": self.tao,
