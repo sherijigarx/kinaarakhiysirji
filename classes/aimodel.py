@@ -18,6 +18,9 @@ import traceback
 import platform
 import psutil
 import GPUtil
+import wandb
+import requests
+import json
 
 class AIModelService:
     _scores = None
@@ -37,6 +40,16 @@ class AIModelService:
             AIModelService._scores = torch.zeros_like(self.metagraph.S, dtype=torch.float32)
         self.scores = AIModelService._scores
         self.uid = self.metagraph.hotkeys.index(self.wallet.hotkey.ss58_address)
+
+        self.runs_data = []
+        # Set up wandb API
+        self.api = wandb.Api()
+        # Define the project path
+        self.project_path = "subnet16team/AudioSubnet_Miner"
+        # List all runs in the project
+        self.runs = self.api.runs(self.project_path)
+        # Directory where we will download the metadata files
+        self.download_dir = "./"
 
     def get_config(self):
         parser = argparse.ArgumentParser()
@@ -157,3 +170,57 @@ class AIModelService:
 
     async def run_async(self):
         raise NotImplementedError
+    
+    def get_config_value(self, config, key):
+        """Safely extract the value from the config, accommodating different data structures."""
+        value = config.get(key)
+        if isinstance(value, (int, str)):
+            return value
+        elif isinstance(value, dict):
+            return value.get('value', 'N/A')
+        return 'N/A'
+
+
+    def get_latest_commit(self, owner, repo):
+        url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            commits = response.json()
+            return commits[0]['sha'] if commits else None
+        else:
+            return None
+
+    def filtered_UIDs(self):
+        owner = "UncleTensor"  # Replace with actual GitHub owner
+        repo = "AudioSubnet"    # Replace with actual GitHub repository
+
+        # Get the latest commit SHA
+        latest_commit = self.get_latest_commit(owner, repo)
+
+        for run in self.runs:
+            if run.state != 'running':
+                continue
+
+            # Initialize data dictionary for this run
+            run_data = {
+                'UID': self.get_config_value(run.config, 'uid'),
+                'Hotkey': self.get_config_value(run.config, 'hotkey'),
+                'Git Commit': 'null'
+            }
+
+            files = run.files()
+            for file in files:
+                if file.name == 'wandb-metadata.json':
+                    file.download(root=self.download_dir, replace=True)
+                    file_path = os.path.join(self.download_dir, file.name)
+                    with open(file_path, 'r') as f:
+                        metadata = json.load(f)
+                        if 'git' in metadata:
+                            run_data['Git Commit'] = metadata['git']['commit']
+
+            # Filter out runs not having the latest commit hash
+            if run_data['Git Commit'] != latest_commit:
+                self.runs_data.append(run_data['UID'])
+
+        return self.runs_data

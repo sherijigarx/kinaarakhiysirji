@@ -19,7 +19,7 @@
 
 # TODO(developer): Change this value when updating your code base.
 # Define the version of the lib module.
-__version__ = "2.0.3"
+__version__ = "2.0.8"
 version_split = __version__.split(".")
 __spec_version__ = (
     (1000 * int(version_split[0]))
@@ -27,14 +27,28 @@ __spec_version__ = (
     + (1 * int(version_split[2]))
 )
 
-BLACKLISTED_IPS_SEG = ['194.68.245.','64.247.206.', '89.187.159.','38.147.83.']
-BLACKLISTED_IPS = ['85.167.195.137']
 
-BLACKLISTED_MINER_COLDKEYS = ['5DwKuRzn2phMDMiJYzUj9grk15sv8MtxgdTi18wy3BEv8Usd']
-BLACKLISTED_MINER_HOTKEYS = []
+BLACKLISTED_IPS_SEG = []
+BLACKLISTED_IPS = []
 
-BLACKLISTED_VALIDATORS = ['5G1NjW9YhXLadMWajvTkfcJy6up3yH2q1YzMXDTi6ijanChe','5Dz8ShM6rtPw1GBAaqxjycT9LF1TC3iDpzpUH9gKr85Nizo6']
-legit_validators = ['5F4tQyWrhfGVcNhoqeiNsR6KjD4wMZ2kfhLj4oHYuyHbZAc3', '5HTZipxVCMqzhLt9QKi2Nxj3Fd6TCSnzTjBKR3vtiuTkuq1B',
+BLACKLISTED_MINER_COLDKEYS = ['5E2RHBCtUcbw5KTGvMWfeaUXKrmcrDVvqYb7EWmZzqfbFHBH',
+    '5Dq1CKGLEdquzy4cr63y39qsmZxZ2g5rSbxnkpLrHXVwXWoV',
+    '5FCZ8g13LsRdASt3rfwEfQZ9iDkDDhoUvScCSFRqocss2ukP',
+    '5CyFQsNqNkGuFsWwbjS3TMW7wLtzAQBKfL4qya7HYhFX1h2s',
+    '5FLF7CKccooocsgSDqDRAqFUktr9LwYK8ALbbZ2FJzmLpJXx',
+    '5FcQHaUjQnJNnRH2ZM9buA4PcxYaQCx79BNSCaPVn17EztMh',
+    '5FqVJrW2jCg2d8nBqrZaivy3SxE2MYUtU2o68FjFwoMdxjG4',
+    '5HeP2f5mSqTJVXwYTUtt98efSGRb7JpFySdny63erdUA9FSd',
+    '5FKwEVKAzVieNyajbPEiyoYGNQYwKX1sLoe3EqZK9Bu3Kcxx',
+    '5G6Aq86k3vFnUBA1ChJGJypz2QprKJgmFtv1mNHavEG9XmQ7',
+    '5GEz9ZQXVkAupXi7br8HtxjVCbCwEWsx6wGJkzg9mPsu9qTG',
+    ]
+
+BLACKLISTED_MINER_HOTKEYS = ['5G1NjW9YhXLadMWajvTkfcJy6up3yH2q1YzMXDTi6ijanChe']
+
+BLACKLISTED_VALIDATORS = ['5G1NjW9YhXLadMWajvTkfcJy6up3yH2q1YzMXDTi6ijanChe']
+legit_validators = ['5F4tQyWrhfGVcNhoqeiNsR6KjD4wMZ2kfhLj4oHYuyHbZAc3',
+    '5HbLYXUBy1snPR8nfioQ7GoA9x76EELzEq9j7F32vWUQHm1x',
     '5Hddm3iBFD2GLT5ik7LZnT3XJUnRnN8PoeCFgGQgawUVKNm8',
     '5HEo565WAy4Dbq3Sv271SAi7syBSofyfhhwRNjFNSM2gP9M2',
     '5CaNj3BarTHotEK1n513aoTtFeXcjf6uvKzAyzNuv9cirUoW',
@@ -53,7 +67,8 @@ legit_validators = ['5F4tQyWrhfGVcNhoqeiNsR6KjD4wMZ2kfhLj4oHYuyHbZAc3', '5HTZipx
     '5Fq5v71D4LX8Db1xsmRSy6udQThcZ8sFDqxQFwnUZ1BuqY5A',
     '5DnXm2tBGAD57ySJv5SfpTfLcsQbSKKp6xZKFWABw3cYUgqg',
     '5HeKSHGdsRCwVgyrHchijnZJnq4wiv6GqoDLNah8R5WMfnLB',
-    '5CVS9d1NcQyWKUyadLevwGxg6LgBcF9Lik6NSnbe5q59jwhE']
+    '5CVS9d1NcQyWKUyadLevwGxg6LgBcF9Lik6NSnbe5q59jwhE',
+    '5Dz8ShM6rtPw1GBAaqxjycT9LF1TC3iDpzpUH9gKr85Nizo6']
 
 MIN_STAKE = 0
 WHITELISTED_VALIDATORS = legit_validators

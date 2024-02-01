@@ -116,6 +116,10 @@ class VoiceCloningService(AIModelService):
                 running_tasks = [task for task in running_tasks if not task.done()]
                 step += 1
 
+                if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
+                    outdated_miners = self.filtered_UIDs()
+                    self.exclude_outdated_miners(outdated_miners)
+
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting VoiceCloneService.")
                 break
@@ -316,6 +320,9 @@ class VoiceCloningService(AIModelService):
             bt.logging.error(f"Error scoring output: {e}")
             return 0.0  # Return a default score in case of an error
 
+    def exclude_outdated_miners(self, outdated_miners):
+        self.outdated_miners_set = set(outdated_miners)
+
     def get_filtered_axons(self):
         try:
             uids = self.metagraph.uids.tolist()
@@ -351,6 +358,7 @@ class VoiceCloningService(AIModelService):
             filtered_zipped_uid = list(filter(lambda x: x[1], zipped_uid))
             filtered_uid = [item[0] for item in filtered_zipped_uid] if filtered_zipped_uid else []
             self.filtered_axon = filtered_uid
+            filtered_uids = [uid for uid in filtered_uids if uid not in self.outdated_miners_set]
             bt.logging.info(f"filtered_uids:{filtered_uids}")
             dendrites_to_query = [filtered_uids[0], filtered_uids[20],filtered_uids[3]]
             # dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )

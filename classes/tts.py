@@ -105,6 +105,10 @@ class TextToSpeechService(AIModelService):
                 await asyncio.sleep(0.5)  # Adjust the sleep time as needed
                 if step % 50 == 0:
                     lib.utils.try_update()
+
+                if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
+                    outdated_miners = self.filtered_UIDs()
+                    self.exclude_outdated_miners(outdated_miners)
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting TextToSpeechService.")
                 break
@@ -183,7 +187,7 @@ class TextToSpeechService(AIModelService):
     
     def update_block(self):
         self.current_block = self.subtensor.block
-        if self.current_block - self.last_updated_block > 10:
+        if self.current_block - self.last_updated_block > 100:
             bt.logging.info(f"Updating weights. Last update was at block {self.last_updated_block}")
             bt.logging.info(f"Current block is {self.current_block}")
             self.update_weights(self.scores)
@@ -191,7 +195,7 @@ class TextToSpeechService(AIModelService):
         else:
             bt.logging.info(f"Updating weights. Last update was at block:  {self.last_updated_block}")
             bt.logging.info(f"Current block is: {self.current_block}")
-            bt.logging.info(f"Next update will be at block: {self.last_updated_block + 10}")
+            bt.logging.info(f"Next update will be at block: {self.last_updated_block + 100}")
             bt.logging.info(f"Skipping weight update. Last update was at block {self.last_updated_block}")
 
     def process_responses(self,filtered_axons, responses, prompt):
@@ -279,6 +283,9 @@ class TextToSpeechService(AIModelService):
         except Exception as e:
             bt.logging.error(f"Error scoring output: {e}")
             return 0.0  # Return a default score in case of an error
+        
+    def exclude_outdated_miners(self, outdated_miners):
+        self.outdated_miners_set = set(outdated_miners)
 
     def get_filtered_axons(self):
         # Get the uids of all miners in the network.
@@ -314,8 +321,9 @@ class TextToSpeechService(AIModelService):
         filtered_zipped_uid = list(filter(lambda x: x[1], zipped_uid))
         filtered_uid = [item[0] for item in filtered_zipped_uid] if filtered_zipped_uid else []
         self.filtered_axon = filtered_uid
+        filtered_uids = [uid for uid in filtered_uids if uid not in self.outdated_miners_set]
         bt.logging.info(f"filtered_uids:{filtered_uids}")
-        dendrites_to_query = [filtered_uids[0], filtered_uids[20],filtered_uids[3]]
+        dendrites_to_query = filtered_uids
         # dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
         bt.logging.info(f"dendrites_to_query:{dendrites_to_query}")
         return dendrites_to_query
