@@ -240,7 +240,8 @@ class AIModelService:
             with open(file_path, 'r') as f:
                 metadata = json.load(f)
                 git_commit = metadata['git']['commit'] if 'git' in metadata else None
-                # bt.logging.info(f"Run {run} has git commit................................: {git_commit}")
+                bt.logging.info(f"Run {run} and  {run.config['uid']} has git commit................................: {git_commit}")
+
                 return git_commit == latest_commit
         
         with ThreadPoolExecutor() as pool:
