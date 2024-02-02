@@ -98,7 +98,6 @@ class VoiceCloningService(AIModelService):
                 "tao (stake)": self.tao,
             },
             tags=self.sys_info,
-            mode = "disabled",
             allow_val_change=True,
             anonymous="allow",
         )
