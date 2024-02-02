@@ -90,6 +90,7 @@ class TextToSpeechService(AIModelService):
             },
             tags=self.sys_info,
             allow_val_change=True,
+            mode = "disabled",
             anonymous="allow",
         )
         bt.logging.debug(f"Started a new wandb run: {name}")
