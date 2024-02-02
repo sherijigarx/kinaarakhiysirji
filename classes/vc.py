@@ -118,6 +118,7 @@ class VoiceCloningService(AIModelService):
                 step += 1
                 try:
                     asyncio.create_task(self.periodically_update_outdated_miners())
+                    bt.logging.info(f"Outdated miners: {self.outdated_miners_set}")
                 except Exception as e:
                     bt.logging.error(f"Error updating outdated miners: {e}")
             except KeyboardInterrupt:
