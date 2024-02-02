@@ -186,7 +186,10 @@ class TextToSpeechService(AIModelService):
         if self.current_block - self.last_updated_block > 100:
             bt.logging.info(f"Updating weights. Last update was at block {self.last_updated_block}")
             bt.logging.info(f"Current block is {self.current_block}")
-            self.update_weights(self.scores)
+            if self.uid not in self.runs_data_valid:
+                self.update_weights(self.scores)
+            else:
+                bt.logging.info(f"Skipping weight update. Please update the repository to latest verions.")
             self.last_updated_block = self.current_block
         else:
             bt.logging.info(f"Updating weights. Last update was at block:  {self.last_updated_block}")

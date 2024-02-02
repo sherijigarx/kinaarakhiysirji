@@ -47,14 +47,18 @@ class AIModelService:
         self.uid = self.metagraph.hotkeys.index(self.wallet.hotkey.ss58_address)
         self.outdated_miners_set = []
         self.runs_data = []
+        self.runs_data_valid = []
         # Set up wandb API
         self.api = wandb.Api()
         # Define the project path
         self.project_path = "subnet16team/AudioSubnet_Miner"
+        self.project_path_valid = "subnet16team/AudioSubnet_Valid"
         # List all runs in the project
         self.runs = self.api.runs(self.project_path)
+        self.runs_valid = self.api.runs(self.project_path_valid)
         # Directory where we will download the metadata files
         self.download_dir = "./"
+        self.download_dir_valid = "./neurons"
         # self.filtered_UIDs()
         self._semaphore = asyncio.Semaphore(10)
         loop = asyncio.get_event_loop()
@@ -206,40 +210,40 @@ class AIModelService:
                 print(f"HTTP request failed: {e}")
                 return None
 
-    # async def filtered_UIDs(self):
-    #     owner = "UncleTensor"  # Replace with actual GitHub owner
-    #     repo = "AudioSubnet"    # Replace with actual GitHub repository
-    #     bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
+    async def filtered_UIDs_valid(self):
+        owner = "UncleTensor"  # Replace with actual GitHub owner
+        repo = "AudioSubnet"    # Replace with actual GitHub repository
+        bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
 
-    #     # Get the latest commit SHA
-    #     latest_commit = await self.get_latest_commit(owner, repo)
-    #     self.runs_data = []
+        # Get the latest commit SHA
+        latest_commit = await self.get_latest_commit(owner, repo)
+        self.runs_data_valid = []
 
-    #     for run in self.runs:
-    #         if run.state != 'running':
-    #             continue
+        for run in self.runs_valid:
+            if run.state != 'running':
+                continue
 
-    #         # Initialize data dictionary for this run
-    #         run_data = {
-    #             'UID': self.get_config_value(run.config, 'uid'),
-    #             'Hotkey': self.get_config_value(run.config, 'hotkey'),
-    #             'Git Commit': 'null'
-    #         }
+            # Initialize data dictionary for this run
+            run_data = {
+                'UID': self.get_config_value(run.config, 'uid'),
+                'Hotkey': self.get_config_value(run.config, 'hotkey'),
+                'Git Commit': 'null'
+            }
 
-    #         files = run.files()
-    #         for file in files:
-    #             if file.name == 'wandb-metadata.json':
-    #                 file.download(root=self.download_dir, replace=True)
-    #                 file_path = os.path.join(self.download_dir, file.name)
-    #                 with open(file_path, 'r') as f:
-    #                     metadata = json.load(f)
-    #                     if 'git' in metadata:
-    #                         run_data['Git Commit'] = metadata['git']['commit']
+            files = run.files()
+            for file in files:
+                if file.name == 'wandb-metadata.json':
+                    file.download(root=self.download_dir_valid, replace=True)
+                    file_path = os.path.join(self.download_dir_valid, file.name)
+                    with open(file_path, 'r') as f:
+                        metadata = json.load(f)
+                        if 'git' in metadata:
+                            run_data['Git Commit'] = metadata['git']['commit']
 
-    #         # Filter out runs not having the latest commit hash
-    #         if run_data['Git Commit'] != latest_commit:
-    #             await self.runs_data.append(run_data['UID'])
-    #             self.runs_data = list(set(self.runs_data))
+            # Filter out runs not having the latest commit hash
+            if run_data['Git Commit'] != latest_commit:
+                await self.runs_data_valid.append(run_data['UID'])
+                self.runs_data_valid = list(set(self.runs_data_valid))
 
 
     async def download_and_check_file(self, file, download_dir, latest_commit):
