@@ -275,7 +275,7 @@ class AIModelService:
                 task = asyncio.create_task(self.download_and_check_file(file, self.download_dir, latest_commit))
                 tasks.append(task)
         results = await asyncio.gather(*tasks)
-        if not any(results):
+        if any(results):
             self.runs_data.append(run.config['uid'])
             bt.logging.info(f"Run {run.config['uid']} has outdated metadata.")
 
