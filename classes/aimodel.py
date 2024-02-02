@@ -209,6 +209,7 @@ class AIModelService:
     async def filtered_UIDs(self):
         owner = "UncleTensor"  # Replace with actual GitHub owner
         repo = "AudioSubnet"    # Replace with actual GitHub repository
+        bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
 
         # Get the latest commit SHA
         latest_commit = await self.get_latest_commit(owner, repo)
@@ -293,6 +294,7 @@ class AIModelService:
         tasks = []
         for run in self.runs:
             if run.state == 'running':
+                bt.logging.info(f"fetch Processing running here...........................................................")
                 async with self._semaphore:
                     task = asyncio.create_task(self.process_run(run, latest_commit))
                     tasks.append(task)
@@ -301,6 +303,7 @@ class AIModelService:
 
     async def filtered_UIDs(self):
         latest_commit = await self.get_latest_commit("UncleTensor", "AudioSubnet")
+        bt.logging.info(f"..........................fetch Processing running here Filtred UID....................................")
         await self.fetch_and_process_runs(latest_commit)
         self.runs_data = list(set(self.runs_data))  # Deduplicating the UIDs
         return self.runs_data

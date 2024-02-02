@@ -2,6 +2,7 @@
 
 from classes.aimodel import AIModelService
 import asyncio
+import bittensor as bt
 
 class UpdateOutdatedMinersService(AIModelService):
     def __init__(self):
@@ -13,6 +14,6 @@ class UpdateOutdatedMinersService(AIModelService):
             try:
                 self.outdated_miners_set = []
                 _ = await self.filtered_UIDs()
-                print(f"Updated outdated miners: {self.outdated_miners_set}")  # Or use logging
+                bt.logging.info(f"Updated outdated miners: {self.outdated_miners_set}")
             except Exception as e:
-                print(f"Error during update of outdated miners: {e}")  # Or use logging
+                bt.logging.error(f"Error during update of outdated miners: {e}")
