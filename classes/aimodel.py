@@ -20,8 +20,10 @@ import psutil
 import GPUtil
 import wandb
 import requests
-import json
 import aiohttp
+import asyncio
+import json
+from concurrent.futures import ThreadPoolExecutor
 
 class AIModelService:
     _scores = None
@@ -184,49 +186,48 @@ class AIModelService:
 
 
 
-    async def get_latest_commit(self, owner, repo):
-        url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+    async def get_latest_commit(owner, repo):
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
+            url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+            async with session.get(url, timeout=10) as response:
                 if response.status == 200:
                     commits = await response.json()
                     return commits[0]['sha'] if commits else None
-                else:
-                    return None
+                return None
 
+    async def process_run(self, run, latest_commit):
+        # Assuming 'run' is an object with a method 'files()' that returns a list of file objects.
+        # Each file object needs a synchronous 'download()' method call.
+        async def download_and_check_file(file, download_dir):
+            # Synchronous code to download the file and check its commit
+            file_path = file.download(root=download_dir, replace=True)  # Assuming this returns the path
+            with open(file_path, 'r') as f:
+                metadata = json.load(f)
+                git_commit = metadata['git']['commit'] if 'git' in metadata else None
+                return git_commit == latest_commit
+        
+        with ThreadPoolExecutor() as pool:
+            # Offload the blocking operation to a separate thread
+            results = await asyncio.gather(*[
+                asyncio.to_thread(download_and_check_file, file, self.download_dir)
+                for file in run.files() if file.name == 'wandb-metadata.json'
+            ])
+            self.runs_data = []
+            # Process the results, which indicate whether the run uses the latest commit
+            if any(results):
+                # If any file's commit matches the latest, consider this run as updated
+                print(f"Run {run} uses the latest commit.")
+            else:
+                # No files match the latest commit, consider this run as outdated
+                print(f"Run {run} does not use the latest commit.")
+                self.runs_data.append(run.config['uid'])
+
+    async def fetch_and_process_runs(self, latest_commit):
+        tasks = [asyncio.create_task(self.process_run(run, latest_commit)) for run in self.runs if run.state == 'running']
+        await asyncio.gather(*tasks)
 
     async def filtered_UIDs(self):
-        owner = "UncleTensor"  # Replace with actual GitHub owner
-        repo = "AudioSubnet"    # Replace with actual GitHub repository
-
-        # Get the latest commit SHA
-        latest_commit = await self.get_latest_commit(owner, repo)
-        self.runs_data = []
-
-        for run in self.runs:
-            if run.state != 'running':
-                continue
-
-            # Initialize data dictionary for this run
-            run_data = {
-                'UID': self.get_config_value(run.config, 'uid'),
-                'Hotkey': self.get_config_value(run.config, 'hotkey'),
-                'Git Commit': 'null'
-            }
-
-            files = run.files()
-            for file in files:
-                if file.name == 'wandb-metadata.json':
-                    file.download(root=self.download_dir, replace=True)
-                    file_path = os.path.join(self.download_dir, file.name)
-                    with open(file_path, 'r') as f:
-                        metadata = json.load(f)
-                        if 'git' in metadata:
-                            run_data['Git Commit'] = metadata['git']['commit']
-
-            # Filter out runs not having the latest commit hash
-            if run_data['Git Commit'] != latest_commit:
-                await self.runs_data.append(run_data['UID'])
-                self.runs_data = list(set(self.runs_data))
-
+        latest_commit = await self.get_latest_commit("UncleTensor", "AudioSubnet")
+        await self.fetch_and_process_runs(latest_commit)
+        self.runs_data = list(set(self.runs_data))  # Deduplicating the UIDs
         return self.runs_data
