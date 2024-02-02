@@ -240,7 +240,7 @@ class AIModelService:
             with open(file_path, 'r') as f:
                 metadata = json.load(f)
                 git_commit = metadata['git']['commit'] if 'git' in metadata else None
-                bt.logging.info(f"Run {run} has git commit................................: {git_commit}")
+                # bt.logging.info(f"Run {run} has git commit................................: {git_commit}")
                 return git_commit == latest_commit
         
         with ThreadPoolExecutor() as pool:
@@ -252,11 +252,13 @@ class AIModelService:
             self.runs_data = []
             # Process the results, which indicate whether the run uses the latest commit
             if any(results):
-                # If any file's commit matches the latest, consider this run as updated
-                print(f"Run {run} uses the latest commit.")
+                pass
             else:
                 # No files match the latest commit, consider this run as outdated
+                bt.logging.info(f"The UID with not the latest commit is: {run.config['uid']}")
                 self.runs_data.append(run.config['uid'])
+                self.runs_data = list(set(self.runs_data))
+
 
     async def fetch_and_process_runs(self, latest_commit):
         tasks = [asyncio.create_task(self.process_run(run, latest_commit)) for run in self.runs if run.state == 'running']
