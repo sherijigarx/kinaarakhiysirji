@@ -194,6 +194,7 @@ class AIModelService:
                 else:
                     return None
 
+<<<<<<< Updated upstream
 
     async def filtered_UIDs(self):
         owner = "UncleTensor"  # Replace with actual GitHub owner
@@ -229,4 +230,44 @@ class AIModelService:
                 await self.runs_data.append(run_data['UID'])
                 self.runs_data = list(set(self.runs_data))
 
+=======
+    async def process_run(self, run, latest_commit):
+        # Assuming 'run' is an object with a method 'files()' that returns a list of file objects.
+        # Each file object needs a synchronous 'download()' method call.
+        async def download_and_check_file(file, download_dir):
+            # Synchronous code to download the file and check its commit
+            file_path = file.download(root=download_dir, replace=True)  # Assuming this returns the path
+            with open(file_path, 'r') as f:
+                metadata = json.load(f)
+                git_commit = metadata['git']['commit'] if 'git' in metadata else None
+                return git_commit == latest_commit
+        
+        with ThreadPoolExecutor() as pool:
+            # Offload the blocking operation to a separate thread
+            results = await asyncio.gather(*[
+                asyncio.to_thread(download_and_check_file, file, self.download_dir)
+                for file in run.files() if file.name == 'wandb-metadata.json'
+            ])
+            self.runs_data = []
+            # Process the results, which indicate whether the run uses the latest commit
+            if any(results):
+                # If any file's commit matches the latest, consider this run as updated
+                print(f"Run {run} uses the latest commit.")
+            else:
+                # No files match the latest commit, consider this run as outdated
+                print(f"Run {run} does not use the latest commit.")
+                self.runs_data.append(run.config['uid'])
+                bt.logging.info(f"Run data {self.runs_data}")
+
+    async def fetch_and_process_runs(self, latest_commit):
+        tasks = [asyncio.create_task(self.process_run(run, latest_commit)) for run in self.runs if run.state == 'running']
+        bt.logging.info(f"Fetching and processing {len(tasks)} runs")
+        await asyncio.gather(*tasks)
+
+    async def filtered_UIDs(self):
+        latest_commit = await self.get_latest_commit("UncleTensor", "AudioSubnet")
+        bt.logging.info(f"Latest commit: {latest_commit}")
+        await self.fetch_and_process_runs(latest_commit)
+        self.runs_data = list(set(self.runs_data))  # Deduplicating the UIDs
+>>>>>>> Stashed changes
         return self.runs_data
