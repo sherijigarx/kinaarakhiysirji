@@ -116,10 +116,10 @@ class VoiceCloningService(AIModelService):
                 # Periodically check and clean up completed tasks
                 running_tasks = [task for task in running_tasks if not task.done()]
                 step += 1
-
-                if step % 3600:  # Assuming each loop is ~0.5 seconds, adjust as needed
-                    self.outdated_miners_set = await self.filtered_UIDs()
-                    bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable in Voice Clone: {self.outdated_miners_set}")
+                try:
+                    asyncio.create_task(self.periodically_update_outdated_miners())
+                except Exception as e:
+                    bt.logging.error(f"Error updating outdated miners: {e}")
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting VoiceCloneService.")
                 break

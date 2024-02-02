@@ -272,11 +272,13 @@ class AIModelService:
         results = await asyncio.gather(*tasks)
         if not any(results):
             self.runs_data.append(run.config['uid'])
+            
 
-    # # Ensure your method for fetching and processing runs correctly awaits `process_run`
-    # async def fetch_and_process_runs(self, latest_commit):
-    #     tasks = [self.process_run(run, latest_commit) for run in self.runs if run.state == 'running']
-    #     await asyncio.gather(*tasks)          z  
+    async def periodically_update_outdated_miners(self):
+        while True:
+            await asyncio.sleep(1800)  # Wait for 30 minutes
+            self.outdated_miners_set = await self.filtered_UIDs()
+            bt.logging.info(f"Updated outdated miners: {self.outdated_miners_set}")     z  
         
 
 
