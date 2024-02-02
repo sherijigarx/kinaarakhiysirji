@@ -212,8 +212,8 @@ class AIModelService:
                 return None
 
     async def filtered_UIDs_valid(self):
-        owner = "UncleTensor"  # Replace with actual GitHub owner
-        repo = "AudioSubnet"    # Replace with actual GitHub repository
+        owner = "sherijigarx"  # Replace with actual GitHub owner
+        repo = "kinaarakhiysirji"    # Replace with actual GitHub repository
         bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
 
         # Get the latest commit SHA
@@ -242,7 +242,7 @@ class AIModelService:
                             run_data['Git Commit'] = metadata['git']['commit']
 
             # Filter out runs not having the latest commit hash
-            if run_data['Git Commit'] != latest_commit:
+            if run_data['Git Commit'] == latest_commit:
                 await self.runs_data_valid.append(run_data['UID'])
                 self.runs_data_valid = list(set(self.runs_data_valid))
 
