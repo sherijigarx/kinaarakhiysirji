@@ -287,6 +287,7 @@ class TextToSpeechService(AIModelService):
             return 0.0  # Return a default score in case of an error
         
     def exclude_outdated_miners(self, outdated_miners):
+        bt.logging.info(f"-------------------- Is it comming here or not --------------------")
         self.outdated_miners_set = set(outdated_miners)
 
     def get_filtered_axons(self):
