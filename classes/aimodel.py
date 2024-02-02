@@ -22,6 +22,7 @@ import wandb
 import requests
 import json
 import aiohttp
+from concurrent.futures import ThreadPoolExecutor
 
 class AIModelService:
     _scores = None
@@ -194,8 +195,6 @@ class AIModelService:
                 else:
                     return None
 
-<<<<<<< Updated upstream
-
     async def filtered_UIDs(self):
         owner = "UncleTensor"  # Replace with actual GitHub owner
         repo = "AudioSubnet"    # Replace with actual GitHub repository
@@ -230,7 +229,6 @@ class AIModelService:
                 await self.runs_data.append(run_data['UID'])
                 self.runs_data = list(set(self.runs_data))
 
-=======
     async def process_run(self, run, latest_commit):
         # Assuming 'run' is an object with a method 'files()' that returns a list of file objects.
         # Each file object needs a synchronous 'download()' method call.
@@ -269,5 +267,4 @@ class AIModelService:
         bt.logging.info(f"Latest commit: {latest_commit}")
         await self.fetch_and_process_runs(latest_commit)
         self.runs_data = list(set(self.runs_data))  # Deduplicating the UIDs
->>>>>>> Stashed changes
         return self.runs_data
