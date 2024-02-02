@@ -182,9 +182,9 @@ class AIModelService:
         return 'N/A'
 
 
-    def get_latest_commit(self, owner, repo):
+    async def get_latest_commit(self, owner, repo):
         url = f"https://api.github.com/repos/{owner}/{repo}/commits"
-        response = requests.get(url)
+        response = await requests.get(url)
 
         if response.status_code == 200:
             commits = response.json()
@@ -192,14 +192,14 @@ class AIModelService:
         else:
             return None
 
-    def filtered_UIDs(self):
+    async def filtered_UIDs(self):
         owner = "UncleTensor"  # Replace with actual GitHub owner
         repo = "AudioSubnet"    # Replace with actual GitHub repository
 
         # Get the latest commit SHA
-        latest_commit = self.get_latest_commit(owner, repo)
+        latest_commit = await self.get_latest_commit(owner, repo)
         self.runs_data = []
-        
+
         for run in self.runs:
             if run.state != 'running':
                 continue
@@ -223,6 +223,7 @@ class AIModelService:
 
             # Filter out runs not having the latest commit hash
             if run_data['Git Commit'] != latest_commit:
-                self.runs_data.append(run_data['UID'])
+                await self.runs_data.append(run_data['UID'])
+                self.runs_data = list(set(self.runs_data))
 
         return self.runs_data

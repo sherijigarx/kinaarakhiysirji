@@ -118,10 +118,8 @@ class VoiceCloningService(AIModelService):
                 step += 1
 
                 # if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
-                outdated_miners = self.filtered_UIDs()
-                bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {outdated_miners}")
-                self.exclude_outdated_miners(outdated_miners)
-
+                self.outdated_miners_set = await self.filtered_UIDs()
+                bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {self.outdated_miners_set}")
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting VoiceCloneService.")
                 break
@@ -253,7 +251,7 @@ class VoiceCloningService(AIModelService):
                     ax,
                     lib.protocol.VoiceClone(roles=["user"], text_input=text_input, clone_input=clone_input, sample_rate=sample_rate,hf_voice_id=self.hf_voice_id),
                     deserialize=True,
-                    timeout=90
+                    timeout=5
                 )
                 # Process the responses if needed
                 self.process_voice_clone_responses(ax)
@@ -321,10 +319,6 @@ class VoiceCloningService(AIModelService):
         except Exception as e:
             bt.logging.error(f"Error scoring output: {e}")
             return 0.0  # Return a default score in case of an error
-
-    def exclude_outdated_miners(self, outdated_miners):
-        bt.logging.info(f"-------------------- Is it comming here or not --------------------")
-        self.outdated_miners_set = set(outdated_miners)
 
     def get_filtered_axons(self):
         try:

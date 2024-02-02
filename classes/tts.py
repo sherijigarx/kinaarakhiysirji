@@ -108,9 +108,8 @@ class TextToSpeechService(AIModelService):
                     lib.utils.try_update()
 
                 # if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
-                outdated_miners = self.filtered_UIDs()
-                bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {outdated_miners}")
-                self.exclude_outdated_miners(outdated_miners)
+                self.outdated_miners_set = await self.filtered_UIDs()
+                bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {self.outdated_miners_set}")
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting TextToSpeechService.")
                 break
@@ -183,7 +182,7 @@ class TextToSpeechService(AIModelService):
             filtered_axons,
             lib.protocol.TextToSpeech(roles=["user"], text_input=prompt),
             deserialize=True,
-            timeout=60,
+            timeout=5,
         )
         return responses
     
@@ -286,10 +285,6 @@ class TextToSpeechService(AIModelService):
             bt.logging.error(f"Error scoring output: {e}")
             return 0.0  # Return a default score in case of an error
         
-    def exclude_outdated_miners(self, outdated_miners):
-        bt.logging.info(f"-------------------- Is it comming here or not --------------------")
-        self.outdated_miners_set = set(outdated_miners)
-
     def get_filtered_axons(self):
         # Get the uids of all miners in the network.
         uids = self.metagraph.uids.tolist()
