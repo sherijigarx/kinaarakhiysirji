@@ -21,6 +21,7 @@ import GPUtil
 import wandb
 import requests
 import json
+import aiohttp
 
 class AIModelService:
     _scores = None
@@ -182,15 +183,17 @@ class AIModelService:
         return 'N/A'
 
 
+
     async def get_latest_commit(self, owner, repo):
         url = f"https://api.github.com/repos/{owner}/{repo}/commits"
-        response = await requests.get(url)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    commits = await response.json()
+                    return commits[0]['sha'] if commits else None
+                else:
+                    return None
 
-        if response.status_code == 200:
-            commits = response.json()
-            return commits[0]['sha'] if commits else None
-        else:
-            return None
 
     async def filtered_UIDs(self):
         owner = "UncleTensor"  # Replace with actual GitHub owner
