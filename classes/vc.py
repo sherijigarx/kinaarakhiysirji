@@ -117,7 +117,7 @@ class VoiceCloningService(AIModelService):
                 running_tasks = [task for task in running_tasks if not task.done()]
                 step += 1
 
-                if step % 10:  # Assuming each loop is ~0.5 seconds, adjust as needed
+                if step % 400:  # Assuming each loop is ~0.5 seconds, adjust as needed
                     self.outdated_miners_set = await self.filtered_UIDs()
                     bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {self.outdated_miners_set}")
             except KeyboardInterrupt:
@@ -217,7 +217,7 @@ class VoiceCloningService(AIModelService):
         audio_data (dict): A dictionary containing 'array' and 'sampling_rate'.
         output_filename (str): The desired output filename for the .wav file.
 
-        Returns:
+        Returns:get_filtered_axons
         str: The path to the generated .wav file.
         """
         try:
