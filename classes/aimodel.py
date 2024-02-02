@@ -198,7 +198,8 @@ class AIModelService:
 
         # Get the latest commit SHA
         latest_commit = self.get_latest_commit(owner, repo)
-
+        self.runs_data = []
+        
         for run in self.runs:
             if run.state != 'running':
                 continue
