@@ -22,7 +22,6 @@ import wandb
 import requests
 import json
 import aiohttp
-from concurrent.futures import ThreadPoolExecutor
 import aiofiles
 import aiohttp
 import json

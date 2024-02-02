@@ -26,3 +26,5 @@ torchaudio
 scipy
 psutil
 GPUtil
+aiofiles
+aiohttp
