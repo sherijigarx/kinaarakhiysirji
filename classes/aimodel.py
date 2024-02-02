@@ -53,7 +53,7 @@ class AIModelService:
         self.api = wandb.Api()
         # Define the project path
         self.project_path = "subnet16team/AudioSubnet_Miner"
-        self.project_path_valid = "testingforsubnet16/subnet16"
+        self.project_path_valid = "subnet16team/AudioSubnet_Valid"
         # List all runs in the project
         self.runs = self.api.runs(self.project_path)
         self.runs_valid = self.api.runs(self.project_path_valid)
@@ -212,8 +212,8 @@ class AIModelService:
                 return None
 
     async def filtered_UIDs_valid(self):
-        owner = "sherijigarx"  # Replace with actual GitHub owner
-        repo = "kinaarakhiysirji"    # Replace with actual GitHub repository
+        owner = "UncleTensor"  # Replace with actual GitHub owner
+        repo = "AudioSubnet"    # Replace with actual GitHub repository
         bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
 
         # Get the latest commit SHA
