@@ -274,11 +274,16 @@ class AIModelService:
             self.runs_data.append(run.config['uid'])
 
 
-    async def periodically_update_outdated_miners(self):
-        while True:
-            await asyncio.sleep(300)  # Wait for 30 minutes
-            self.outdated_miners_set = await self.filtered_UIDs()
-            bt.logging.info(f"Updated outdated miners: {self.outdated_miners_set}")
+    # async def periodically_update_outdated_miners(self):
+    #     while True:
+    #         bt.logging.info("Starting to update outdated miners.")
+    #         await asyncio.sleep(300)  # 30 minutes
+    #         try:
+    #             self.outdated_miners_set = await self.filtered_UIDs()
+    #             bt.logging.info(f"Updated outdated miners: {self.outdated_miners_set}")
+    #         except Exception as e:
+    #             bt.logging.error(f"Error during update of outdated miners: {e}")
+    #         bt.logging.info("Completed updating outdated miners.")
         
 
 

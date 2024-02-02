@@ -106,11 +106,6 @@ class TextToSpeechService(AIModelService):
                 await asyncio.sleep(0.5)  # Adjust the sleep time as needed
                 if step % 50 == 0:
                     lib.utils.try_update()
-                try:
-                    asyncio.create_task(self.periodically_update_outdated_miners())
-                    bt.logging.info(f"Outdated miners: {self.outdated_miners_set}")
-                except Exception as e:
-                    bt.logging.error(f"Error updating outdated miners: {e}")
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting TextToSpeechService.")
                 break

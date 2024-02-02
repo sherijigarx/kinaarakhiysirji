@@ -36,23 +36,30 @@ from classes.vc import VoiceCloningService
 
 
 
+# Update validator.py to include the new UpdateOutdatedMinersService
+
+import asyncio
+from classes.tts import TextToSpeechService
+from classes.vc import VoiceCloningService
+from classes.update_miner import UpdateOutdatedMinersService
+
 async def main():
-    # AIModelService()
     tts_service = TextToSpeechService()
     tts_service.new_wandb_run()
 
     vc_service = VoiceCloningService()
     vc_service.new_wandb_run()
 
-    # Start vc_service with higher "priority"
+    update_miners_service = UpdateOutdatedMinersService()
+
+    # Start all services asynchronously
     vc_task = asyncio.create_task(vc_service.run_async())
-
-    # Introduce a short delay before starting tts_service
-    await asyncio.sleep(0.1)  # Adjust the delay as needed
     tts_task = asyncio.create_task(tts_service.run_async())
+    update_miners_task = asyncio.create_task(update_miners_service.run_async())
 
-    # Wait for both tasks to complete
-    await asyncio.gather(vc_task, tts_task)
+    # Wait for all tasks to complete
+    await asyncio.gather(vc_task, tts_task, update_miners_task)
 
 if __name__ == "__main__":
     asyncio.run(main())
+
