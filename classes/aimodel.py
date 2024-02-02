@@ -240,6 +240,7 @@ class AIModelService:
             with open(file_path, 'r') as f:
                 metadata = json.load(f)
                 git_commit = metadata['git']['commit'] if 'git' in metadata else None
+                bt.logging.info(f"Run {run} has git commit................................: {git_commit}")
                 return git_commit == latest_commit
         
         with ThreadPoolExecutor() as pool:
@@ -264,7 +265,6 @@ class AIModelService:
 
     async def filtered_UIDs(self):
         latest_commit = await self.get_latest_commit("UncleTensor", "AudioSubnet")
-        bt.logging.info(f"Latest commit: {latest_commit}")
         await self.fetch_and_process_runs(latest_commit)
         self.runs_data = list(set(self.runs_data))  # Deduplicating the UIDs
         return self.runs_data
