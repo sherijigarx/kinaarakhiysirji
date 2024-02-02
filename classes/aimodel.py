@@ -34,7 +34,6 @@ class AIModelService:
         self.setup_subtensor()
         self.setup_dendrite()
         self.setup_metagraph()
-        self.filtered_UIDs()
         self.vcdnp = self.config.vcdnp
         self.max_mse = self.config.max_mse
         if AIModelService._scores is None:
@@ -51,6 +50,7 @@ class AIModelService:
         self.runs = self.api.runs(self.project_path)
         # Directory where we will download the metadata files
         self.download_dir = "./"
+        self.filtered_UIDs()
 
     def get_config(self):
         parser = argparse.ArgumentParser()
