@@ -117,7 +117,7 @@ class VoiceCloningService(AIModelService):
                 running_tasks = [task for task in running_tasks if not task.done()]
                 step += 1
 
-                if step % 400:  # Assuming each loop is ~0.5 seconds, adjust as needed
+                if step % 3600:  # Assuming each loop is ~0.5 seconds, adjust as needed
                     self.outdated_miners_set = await self.filtered_UIDs()
                     bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {self.outdated_miners_set}")
             except KeyboardInterrupt:
