@@ -107,10 +107,10 @@ class TextToSpeechService(AIModelService):
                 if step % 50 == 0:
                     lib.utils.try_update()
 
-                # if step % 1:  # Assuming each loop is ~0.5 seconds, adjust as needed
-                outdated_miners = self.filtered_UIDs()
-                bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {outdated_miners}")
-                self.exclude_outdated_miners(outdated_miners)
+                if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
+                    outdated_miners = self.filtered_UIDs()
+                    bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {outdated_miners}")
+                    self.exclude_outdated_miners(outdated_miners)
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting TextToSpeechService.")
                 break
