@@ -277,6 +277,7 @@ class AIModelService:
         results = await asyncio.gather(*tasks)
         if not any(results):
             self.runs_data.append(run.config['uid'])
+            bt.logging.info(f"Run {run.config['uid']} has outdated metadata.")
 
 
     # async def periodically_update_outdated_miners(self):
@@ -289,10 +290,7 @@ class AIModelService:
     #         except Exception as e:
     #             bt.logging.error(f"Error during update of outdated miners: {e}")
     #         bt.logging.info("Completed updating outdated miners.")
-        
-
-
-  # Adjust the number based on your needs
+    # Adjust the number based on your needs
 
     async def fetch_and_process_runs(self, latest_commit):
         tasks = []
