@@ -40,7 +40,7 @@ class AIModelService:
             AIModelService._scores = torch.zeros_like(self.metagraph.S, dtype=torch.float32)
         self.scores = AIModelService._scores
         self.uid = self.metagraph.hotkeys.index(self.wallet.hotkey.ss58_address)
-
+        self.outdated_miners_set = []
         self.runs_data = []
         # Set up wandb API
         self.api = wandb.Api()
@@ -51,6 +51,8 @@ class AIModelService:
         # Directory where we will download the metadata files
         self.download_dir = "./"
         self.filtered_UIDs()
+        self.outdated_miners_set =  self.filtered_UIDs()
+
 
     def get_config(self):
         parser = argparse.ArgumentParser()

@@ -38,7 +38,6 @@ class VoiceCloningService(AIModelService):
         self.minimum_dendrites_per_query = 5  # Example value, adjust as needed
         self.last_run_date = dt.date.today()
         self.tao = self.metagraph.neurons[self.uid].stake.tao
-        self.outdated_miners_set = []
 
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.source_path = os.path.join(audio_subnet_path, "vc_source")
@@ -117,9 +116,7 @@ class VoiceCloningService(AIModelService):
                 running_tasks = [task for task in running_tasks if not task.done()]
                 step += 1
 
-                # if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
-                self.outdated_miners_set = self.filtered_UIDs()
-                bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {self.outdated_miners_set}")
+
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting VoiceCloneService.")
                 break

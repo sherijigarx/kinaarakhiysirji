@@ -39,7 +39,6 @@ class TextToSpeechService(AIModelService):
         self.p_index = 0
         self.last_run_date = dt.date.today()
         self.tao = self.metagraph.neurons[self.uid].stake.tao
-        self.outdated_miners_set = []
         
         ###################################### DIRECTORY STRUCTURE ###########################################
         self.tts_source_dir = os.path.join(audio_subnet_path, "tts_source")
@@ -107,9 +106,6 @@ class TextToSpeechService(AIModelService):
                 if step % 50 == 0:
                     lib.utils.try_update()
 
-                # if step % (5 * 60 / 0.5) == 0:  # Assuming each loop is ~0.5 seconds, adjust as needed
-                self.outdated_miners_set = self.filtered_UIDs()
-                bt.logging.info(f"Outdated miners before going to exclude_outdated_miners variable: {self.outdated_miners_set}")
             except KeyboardInterrupt:
                 print("Keyboard interrupt detected. Exiting TextToSpeechService.")
                 break
