@@ -11,6 +11,7 @@ class UpdateOutdatedMinersService(AIModelService):
         while True:
             await asyncio.sleep(300)  # Wait for 30 minutes
             try:
+                self.outdated_miners_set = []
                 _ = await self.filtered_UIDs()
                 print(f"Updated outdated miners: {self.outdated_miners_set}")  # Or use logging
             except Exception as e:
