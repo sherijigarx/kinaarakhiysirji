@@ -257,7 +257,6 @@ class AIModelService:
                 # No files match the latest commit, consider this run as outdated
                 print(f"Run {run} does not use the latest commit.")
                 self.runs_data.append(run.config['uid'])
-                bt.logging.info(f"Run data {self.runs_data}")
 
     async def fetch_and_process_runs(self, latest_commit):
         tasks = [asyncio.create_task(self.process_run(run, latest_commit)) for run in self.runs if run.state == 'running']
