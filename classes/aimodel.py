@@ -51,8 +51,6 @@ class AIModelService:
         # Directory where we will download the metadata files
         self.download_dir = "./"
         self.filtered_UIDs()
-        self.outdated_miners_set =  self.filtered_UIDs()
-
 
     def get_config(self):
         parser = argparse.ArgumentParser()
