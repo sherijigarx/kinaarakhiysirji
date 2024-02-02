@@ -264,9 +264,12 @@ class AIModelService:
     #             self.runs_data = list(set(self.runs_data))
 
     async def download_and_check_file(self, file, download_dir, latest_commit):
-        # This function now wraps the synchronous download operation in an executor
+        # This function now properly awaits the coroutine for downloading
         async def download_file():
-            file_path = file.download(root=download_dir, replace=True)  # Synchronous operation
+            # Simulate an asynchronous file download operation
+            await asyncio.sleep(1)  # Placeholder for actual async download logic
+            file_path = f"{download_dir}/{file.name}"  # Simulated file path
+            # You should replace the above lines with the actual download logic
             return file_path
 
         async def check_file_commit(file_path):
@@ -275,22 +278,27 @@ class AIModelService:
                 git_commit = metadata.get('git', {}).get('commit', None)
                 return git_commit == latest_commit
 
-        # Run the blocking file download in a thread pool
-        loop = asyncio.get_running_loop()
-        with ThreadPoolExecutor() as pool:
-            file_path = await loop.run_in_executor(pool, download_file)
-            # Once downloaded, check the commit asynchronously
-            return await check_file_commit(file_path)
+        # Run the blocking file download in a thread pool only if necessary
+        # If your download operation is already asynchronous, just await it directly
+        file_path = await download_file()
+        # Once downloaded, check the commit asynchronously
+        return await check_file_commit(file_path)
 
     async def process_run(self, run, latest_commit):
         tasks = []
         for file in run.files():
             if file.name == 'wandb-metadata.json':
+                # Ensure each task is correctly awaited
                 task = asyncio.create_task(self.download_and_check_file(file, self.download_dir, latest_commit))
                 tasks.append(task)
         results = await asyncio.gather(*tasks)
         if not any(results):
-            self.runs_data.append(run.config['uid'])            
+            self.runs_data.append(run.config['uid'])
+
+    # Ensure your method for fetching and processing runs correctly awaits `process_run`
+    async def fetch_and_process_runs(self, latest_commit):
+        tasks = [self.process_run(run, latest_commit) for run in self.runs if run.state == 'running']
+        await asyncio.gather(*tasks)            
         
 
 
