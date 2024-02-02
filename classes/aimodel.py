@@ -52,7 +52,9 @@ class AIModelService:
         self.runs = self.api.runs(self.project_path)
         # Directory where we will download the metadata files
         self.download_dir = "./"
-        self.filtered_UIDs()
+        # self.filtered_UIDs()
+        loop = asyncio.get_event_loop()
+        self.outdated_miners_set = loop.run_until_complete(self.filtered_UIDs())
 
     def get_config(self):
         parser = argparse.ArgumentParser()
