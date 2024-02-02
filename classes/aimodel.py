@@ -255,7 +255,6 @@ class AIModelService:
                 print(f"Run {run} uses the latest commit.")
             else:
                 # No files match the latest commit, consider this run as outdated
-                print(f"Run {run} does not use the latest commit.")
                 self.runs_data.append(run.config['uid'])
 
     async def fetch_and_process_runs(self, latest_commit):
