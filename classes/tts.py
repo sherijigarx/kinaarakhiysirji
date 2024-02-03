@@ -79,8 +79,8 @@ class TextToSpeechService(AIModelService):
         name = f"Validator-{self.uid}-{run_id}"
         self.wandb_run = wandb.init(
             name=name,
-            project="AudioSubnet_Valid",
-            entity="subnet16team",
+            project="subnet16",
+            entity="testingforsubnet16",
             config={
                 "uid": self.uid,
                 "hotkey": self.wallet.hotkey.ss58_address,
