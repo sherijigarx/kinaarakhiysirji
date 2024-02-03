@@ -268,8 +268,6 @@ class AIModelService:
             if run_data['Git Commit'] != self.latest_commit:
                 self.runs_data.append(run_data['UID'])
                 self.runs_data = list(set(self.runs_data))
-        bt.logging.info(f"......................................... Run data .........................................: {self.run_data}")
-
 
     # async def download_and_check_file(self, file, download_dir, latest_commit):
     #     # This function now properly awaits the coroutine for downloading
