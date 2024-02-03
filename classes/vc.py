@@ -349,10 +349,10 @@ class VoiceCloningService(AIModelService):
             filtered_uids = [item[0] for item in filtered_zipped_uids] if filtered_zipped_uids else []
             filtered_zipped_uid = list(filter(lambda x: x[1], zipped_uid))
             filtered_uid = [item[0] for item in filtered_zipped_uid] if filtered_zipped_uid else []
-            bt.logging.info(f"outdated miners before line number 325:{self.outdated_miners_set}")
+            bt.logging.info(f"outdated miners before line number 325:{self.runs_data}")
             bt.logging.info(f"filtered_uids before line number 325:{filtered_uids}")
             self.filtered_axon = filtered_uid
-            filtered_uids = [uid for uid in filtered_uids if uid not in self.outdated_miners_set]
+            filtered_uids = [uid for uid in filtered_uids if uid not in self.runs_data]
             bt.logging.info(f"filtered_uids after deleting outdated miners:{filtered_uids}")
             # dendrites_to_query = filtered_uids
             dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )

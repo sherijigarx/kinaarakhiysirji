@@ -61,9 +61,9 @@ class AIModelService:
         self.download_dir = "./"
         self.download_dir_valid = "./neurons"
         # self.filtered_UIDs()
-        self._semaphore = asyncio.Semaphore(10)
-        loop = asyncio.get_event_loop()
-        self.outdated_miners_set = loop.run_until_complete(self.filtered_UIDs())
+        # self._semaphore = asyncio.Semaphore(10)
+        # loop = asyncio.get_event_loop()
+        # self.outdated_miners_set = loop.run_until_complete(self.filtered_UIDs())
 
     def get_config(self):
         parser = argparse.ArgumentParser()
