@@ -307,8 +307,8 @@ class AIModelService:
         tasks = []
         bt.logging.info(f"All RUNS.........................................: {self.runs}")
         for run in self.runs:
-            bt.logging.info(f" run state is ............................................................... {run.state}")
             if run.state == 'running':
+                bt.logging.info(f" run state is ............................................................... {run.state}")
                 async with self._semaphore:
                     task = asyncio.create_task(self.process_run(run, latest_commit))
                     tasks.append(task)
