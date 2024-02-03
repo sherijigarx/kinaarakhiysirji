@@ -13,7 +13,7 @@ class UpdateOutdatedMinersService(AIModelService):
             await asyncio.sleep(300)  # Wait for 30 minutes
             try:
                 self.runs_data = []
-                _ = await self.filtered_UIDs_Miner()
+                await self.filtered_UIDs_Miner()
                 bt.logging.info(f"Updated outdated miners: {self.runs_data}")
             except Exception as e:
                 bt.logging.error(f"Error during update of outdated miners: {e}")
