@@ -196,24 +196,17 @@ class AIModelService:
             return value.get('value', 'N/A')
         return 'N/A'
 
-    async def get_latest_commit(self):
+    def get_latest_commit(self):
         owner = "UncleTensor"
         repo = "AudioSubnet"
         url = f"https://api.github.com/repos/{owner}/{repo}/commits"
-        timeout = aiohttp.ClientTimeout(total=60)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            try:
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        commits = await response.json()
-                        latest_commit = commits[0]['sha']
-                        return latest_commit
-                    else:
-                        bt.logging.error(f"Failed to get latest commit. Status code: {response.status}")
-                        return None
-            except aiohttp.ClientError as e:
-                bt.logging.error(f"HTTP request failed: {e}")
-                return None
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            commits = response.json()
+            return commits[0]['sha'] if commits else None
+        else:
+            return None
             
     async def filtered_UIDs_valid(self):
         # Get the latest commit SHA
