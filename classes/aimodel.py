@@ -286,8 +286,8 @@ class AIModelService:
                 await self.runs_data.append(run_data['UID'])
                 # bt.logging.info(f"Run data.........................................: {run_data['Hotkey']}")
                 # bt.logging.info(f"Run data.........................................: {run_data['Git Commit']}")
-                self.runs_data = list(set(self.runs_data_valid))
                 bt.logging.info(f".........................................Run data.........................................: {run_data}")
+                self.runs_data = list(set(self.runs_data_valid))
 
 
 
