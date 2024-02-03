@@ -60,7 +60,6 @@ class AIModelService:
         # Directory where we will download the metadata files
         self.download_dir = "./"
         self.download_dir_valid = "./neurons"
-        self.filtered_UIDs_valid()
         # self.filtered_UIDs()
         # self._semaphore = asyncio.Semaphore(10)
         # loop = asyncio.get_event_loop()
