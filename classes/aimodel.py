@@ -257,7 +257,7 @@ class AIModelService:
             files = run.files()
             for file in files:
                 if file.name == 'wandb-metadata.json':
-                    await file.download(root=self.download_dir, replace=True)
+                    file.download(root=self.download_dir, replace=True)
                     file_path = os.path.join(self.download_dir, file.name)
                     with open(file_path, 'r') as f:
                         metadata = json.load(f)
@@ -267,12 +267,8 @@ class AIModelService:
             # Filter out runs not having the latest commit hash
             if run_data['Git Commit'] != self.latest_commit:
                 self.runs_data.append(run_data['UID'])
-                bt.logging.info(f"Run data.........................................: {run_data}")
                 self.runs_data = list(set(self.runs_data))
-
-
-
-
+                bt.logging.info(f"Run data.........................................: {self.run_data}")
 
 
     # async def download_and_check_file(self, file, download_dir, latest_commit):
