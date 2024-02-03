@@ -238,7 +238,6 @@ class AIModelService:
             if run_data['Git Commit'] == self.latest_commit:
                 await self.runs_data_valid.append(run_data['UID'])
                 self.runs_data_valid = list(set(self.runs_data_valid))
-        bt.logging.info(f"......................................... Run data .........................................: {self.runs_data_valid}")
 
     async def filtered_UIDs_Miner(self):
         self.runs_data = []
