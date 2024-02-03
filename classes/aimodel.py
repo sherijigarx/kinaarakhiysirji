@@ -54,6 +54,7 @@ class AIModelService:
         self.project_path = "subnet16team/AudioSubnet_Miner"
         self.project_path_valid = "subnet16team/AudioSubnet_Valid"
         # List all runs in the project
+        self.latest_commit = self.get_latest_commit()
         self.runs = self.api.runs(self.project_path)
         self.runs_valid = self.api.runs(self.project_path_valid)
         self.runs_miner = self.api.runs(self.project_path)
@@ -194,9 +195,9 @@ class AIModelService:
             return value.get('value', 'N/A')
         return 'N/A'
 
-
-
-    async def get_latest_commit(self, owner, repo):
+    async def get_latest_commit(self):
+        owner = "UncleTensor"
+        repo = "AudioSubnet"
         url = f"https://api.github.com/repos/{owner}/{repo}/commits"
         timeout = aiohttp.ClientTimeout(total=60)
         async with aiohttp.ClientSession(timeout=timeout) as session:
@@ -212,14 +213,9 @@ class AIModelService:
             except aiohttp.ClientError as e:
                 bt.logging.error(f"HTTP request failed: {e}")
                 return None
-
-
+            
     async def filtered_UIDs_valid(self):
-        owner = "UncleTensor"  # Replace with actual GitHub owner
-        repo = "AudioSubnet"    # Replace with actual GitHub repository
-
         # Get the latest commit SHA
-        latest_commit = self.get_latest_commit(owner, repo)
         self.runs_data_valid = []
 
         for run in self.runs_valid:
@@ -244,10 +240,10 @@ class AIModelService:
                             run_data['Git Commit'] = metadata['git']['commit']
 
             # Filter out runs not having the latest commit hash
-            if run_data['Git Commit'] == latest_commit:
+            if run_data['Git Commit'] == self.latest_commit:
                 await self.runs_data_valid.append(run_data['UID'])
                 self.runs_data_valid = list(set(self.runs_data_valid))
-
+                bt.logging.info(f".........................................Run data.........................................: {self.runs_data_valid}")
 
     # async def filtered_UIDs_Miner(self):
     #     owner = "UncleTensor"  # Replace with actual GitHub owner
