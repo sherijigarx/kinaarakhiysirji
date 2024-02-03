@@ -82,7 +82,7 @@ class TextToSpeechService(AIModelService):
             return commit_hash
         except subprocess.CalledProcessError:
             # If the git command fails, for example, if this is not a git repository
-            print("Failed to get git commit hash.")
+            bt.logging.error("Failed to get git commit hash. '.git' folder is missing")
             return None
     
     def new_wandb_run(self):
