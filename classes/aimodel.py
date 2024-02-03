@@ -203,12 +203,16 @@ class AIModelService:
                 async with session.get(url) as response:
                     if response.status == 200:
                         commits = await response.json()
-                        return commits[0]['sha'] if commits else None
+                        latest_commit = commits[0]['sha']
+                        bt.logging.info(f"Latest commit hash: {latest_commit}")
+                        return latest_commit
                     else:
+                        bt.logging.error(f"Failed to get latest commit. Status code: {response.status}")
                         return None
             except aiohttp.ClientError as e:
-                print(f"HTTP request failed: {e}")
+                bt.logging.error(f"HTTP request failed: {e}")
                 return None
+
 
     async def filtered_UIDs_valid(self):
         owner = "UncleTensor"  # Replace with actual GitHub owner
@@ -251,9 +255,13 @@ class AIModelService:
         async def download_file():
             # Simulate an asynchronous file download operation
             await asyncio.sleep(1)  # Placeholder for actual async download logic
-            file_path = f"{download_dir}/{file.name}"  # Simulated file path
-            # You should replace the above lines with the actual download logic
-            return file_path
+            try:
+                file_path = f"{download_dir}/{file.name}"  # Simulated file path
+                # You should replace the above lines with the actual download logic
+                return file_path
+            except Exception as e:
+                bt.logging(f"Error during file download: {e}")
+                return None
 
         async def check_file_commit(file_path):
             async with aiofiles.open(file_path, 'r') as f:
@@ -271,13 +279,16 @@ class AIModelService:
         tasks = []
         for file in run.files():
             if file.name == 'wandb-metadata.json':
-                # Ensure each task is correctly awaited
                 task = asyncio.create_task(self.download_and_check_file(file, self.download_dir, latest_commit))
                 tasks.append(task)
         results = await asyncio.gather(*tasks)
+        # Assuming `download_and_check_file` returns True if the commit matches the latest commit
         if any(results):
             self.runs_data.append(run.config['uid'])
-            bt.logging.info(f"Run {run.config['uid']} has outdated metadata.")
+            bt.logging.info(f"Run {run.config['uid']} is using the latest commit.")
+        else:
+            bt.logging.info(f"Run {run.config['uid']} has outdated commit.")
+
 
 
     # async def periodically_update_outdated_miners(self):
@@ -294,7 +305,9 @@ class AIModelService:
 
     async def fetch_and_process_runs(self, latest_commit):
         tasks = []
+        bt.logging.info(f"All RUNS.........................................: {self.runs}")
         for run in self.runs:
+            bt.logging.info(f" run state is ............................................................... {run.state}")
             if run.state == 'running':
                 async with self._semaphore:
                     task = asyncio.create_task(self.process_run(run, latest_commit))
@@ -304,6 +317,7 @@ class AIModelService:
 
     async def filtered_UIDs(self):
         latest_commit = await self.get_latest_commit("UncleTensor", "AudioSubnet")
+        bt.logging.info(f"Latest commit.........................................: {latest_commit}")
         await self.fetch_and_process_runs(latest_commit)
         self.runs_data = list(set(self.runs_data))  # Deduplicating the UIDs
         return self.runs_data
