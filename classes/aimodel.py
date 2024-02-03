@@ -266,7 +266,7 @@ class AIModelService:
 
             # Filter out runs not having the latest commit hash
             if run_data['Git Commit'] != self.latest_commit:
-                await self.runs_data.append(run_data['UID'])
+                self.runs_data.append(run_data['UID'])
                 bt.logging.info(f"Run data.........................................: {run_data}")
                 self.runs_data = list(set(self.runs_data))
 
