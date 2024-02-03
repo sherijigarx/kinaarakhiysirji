@@ -58,7 +58,6 @@ class AIModelService:
         self.latest_commit = self.get_latest_commit()
         self.runs = self.api.runs(self.project_path)
         self.runs_valid = self.api.runs(self.project_path_valid)
-        self.runs_miner = self.api.runs(self.project_path)
         # Directory where we will download the metadata files
         self.download_dir = "./"
         self.download_dir_valid = "./neurons"
@@ -215,61 +214,61 @@ class AIModelService:
         self.runs_data_valid = []
 
         for run in self.runs_valid:
-            if run.state != 'running':
+            if run.state == 'running':
+                # Initialize data dictionary for this run
+                run_data = {
+                    'UID': self.get_config_value(run.config, 'uid'),
+                    'Hotkey': self.get_config_value(run.config, 'hotkey'),
+                    'Git Commit': 'null'
+                }
+
+                files = run.files()
+                for file in files:
+                    if file.name == 'wandb-metadata.json':
+                        file.download(root=self.download_dir_valid, replace=True)
+                        file_path = os.path.join(self.download_dir_valid, file.name)
+                        with open(file_path, 'r') as f:
+                            metadata = json.load(f)
+                            if 'git' in metadata:
+                                run_data['Git Commit'] = metadata['git']['commit']
+
+                # Filter out runs not having the latest commit hash
+                if run_data['Git Commit'] == self.latest_commit:
+                    await self.runs_data_valid.append(run_data['UID'])
+            else:
                 continue
-
-            # Initialize data dictionary for this run
-            run_data = {
-                'UID': self.get_config_value(run.config, 'uid'),
-                'Hotkey': self.get_config_value(run.config, 'hotkey'),
-                'Git Commit': 'null'
-            }
-
-            files = run.files()
-            for file in files:
-                if file.name == 'wandb-metadata.json':
-                    file.download(root=self.download_dir_valid, replace=True)
-                    file_path = os.path.join(self.download_dir_valid, file.name)
-                    with open(file_path, 'r') as f:
-                        metadata = json.load(f)
-                        if 'git' in metadata:
-                            run_data['Git Commit'] = metadata['git']['commit']
-
-            # Filter out runs not having the latest commit hash
-            if run_data['Git Commit'] == self.latest_commit:
-                await self.runs_data_valid.append(run_data['UID'])
-                self.runs_data_valid = list(set(self.runs_data_valid))
-                bt.logging.info(f"......................................... Validators with latest commit .........................................: {self.runs_data_valid}")
+        self.runs_data_valid = list(set(self.runs_data_valid))
+        bt.logging.info(f"......................................... Validators with latest commit .........................................: {self.runs_data_valid}")
 
     async def filtered_UIDs_Miner(self):
         self.runs_data = []
 
-        for run in self.runs_miner:
-            if run.state != 'running':
+        for run in self.runs:
+            if run.state == 'running':
+                # Initialize data dictionary for this run
+                run_data = {
+                    'UID': self.get_config_value(run.config, 'uid'),
+                    'Hotkey': self.get_config_value(run.config, 'hotkey'),
+                    'Git Commit': 'null'
+                }
+
+                files = run.files()
+                for file in files:
+                    if file.name == 'wandb-metadata.json':
+                        file.download(root=self.download_dir, replace=True)
+                        file_path = os.path.join(self.download_dir, file.name)
+                        with open(file_path, 'r') as f:
+                            metadata = json.load(f)
+                            if 'git' in metadata:
+                                run_data['Git Commit'] = metadata['git']['commit']
+
+                # Filter out runs not having the latest commit hash
+                if run_data['Git Commit'] != self.latest_commit:
+                    self.runs_data.append(run_data['UID'])
+            else:
                 continue
-
-            # Initialize data dictionary for this run
-            run_data = {
-                'UID': self.get_config_value(run.config, 'uid'),
-                'Hotkey': self.get_config_value(run.config, 'hotkey'),
-                'Git Commit': 'null'
-            }
-
-            files = run.files()
-            for file in files:
-                if file.name == 'wandb-metadata.json':
-                    file.download(root=self.download_dir, replace=True)
-                    file_path = os.path.join(self.download_dir, file.name)
-                    with open(file_path, 'r') as f:
-                        metadata = json.load(f)
-                        if 'git' in metadata:
-                            run_data['Git Commit'] = metadata['git']['commit']
-
-            # Filter out runs not having the latest commit hash
-            if run_data['Git Commit'] != self.latest_commit:
-                self.runs_data.append(run_data['UID'])
-                self.runs_data = list(set(self.runs_data))
-                bt.logging.info(f"......................................... Miners without commit .........................................: {self.runs_data}")
+        self.runs_data = list(set(self.runs_data))
+        bt.logging.info(f"......................................... Miners without commit .........................................: {self.runs_data}")
 
     # async def download_and_check_file(self, file, download_dir, latest_commit):
     #     # This function now properly awaits the coroutine for downloading
