@@ -18,6 +18,8 @@ import lib.protocol
 from lib.protocol import VoiceClone
 from lib.clone_score import CloneScore
 from classes.aimodel import AIModelService
+import subprocess
+
 
 # Set the project root path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -81,11 +83,23 @@ class VoiceCloningService(AIModelService):
             if self.wandb_run:
                 wandb.finish()  # End the current run
             self.new_wandb_run()  # Start a new run
-
+   
+    def get_git_commit_hash(self):
+        try:
+            # Run the git command to get the current commit hash
+            commit_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode('ascii').strip()
+            return commit_hash
+        except subprocess.CalledProcessError:
+            # If the git command fails, for example, if this is not a git repository
+            print("Failed to get git commit hash.")
+            return None
+    
     def new_wandb_run(self):
         now = dt.datetime.now()
         run_id = now.strftime("%Y-%m-%d_%H-%M-%S")
         name = f"Validator-{self.uid}-{run_id}"
+        # Get the current git commit hash
+        commit_hash = self.get_git_commit_hash()
         self.wandb_run = wandb.init(
             name=name,
             project="subnet16",
@@ -96,6 +110,7 @@ class VoiceCloningService(AIModelService):
                 "run_name": run_id,
                 "type": "Validator",
                 "tao (stake)": self.tao,
+                "commit_hash": commit_hash,  # Add the commit hash here
             },
             tags=self.sys_info,
             allow_val_change=True,
@@ -195,9 +210,9 @@ class VoiceCloningService(AIModelService):
             # Schedule both tasks to run concurrently
             huggingface_task = asyncio.create_task(self.process_huggingface_prompts(step))
             local_files_task = asyncio.create_task(self.process_local_files(step, sound_files))
-            background_task_valid = asyncio.create_task(self.filtered_UIDs_valid())
-            background_task_miner = asyncio.create_task(self.filtered_UIDs_Miner())
-            tasks.extend([huggingface_task, local_files_task, background_task_valid, background_task_miner])
+            # background_task_valid = asyncio.create_task(self.filtered_UIDs_valid())
+            # background_task_miner = asyncio.create_task(self.filtered_UIDs_Miner())
+            tasks.extend([huggingface_task, local_files_task]) # background_task_valid, background_task_miner
 
         except Exception as e:
             bt.logging.error(f"An error occurred in VoiceCloningService: {e}")
