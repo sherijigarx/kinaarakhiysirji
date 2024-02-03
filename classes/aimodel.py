@@ -277,7 +277,7 @@ class AIModelService:
                     await file.download(root=self.download_dir, replace=True)
                     file_path = os.path.join(self.download_dir, file.name)
                     with open(file_path, 'r') as f:
-                        metadata = await json.load(f)
+                        metadata = json.load(f)
                         if 'git' in metadata:
                             run_data['Git Commit'] = metadata['git']['commit']
 
