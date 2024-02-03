@@ -205,7 +205,6 @@ class AIModelService:
                     if response.status == 200:
                         commits = await response.json()
                         latest_commit = commits[0]['sha']
-                        bt.logging.info(f"Latest commit hash: {latest_commit}")
                         return latest_commit
                     else:
                         bt.logging.error(f"Failed to get latest commit. Status code: {response.status}")
@@ -218,7 +217,6 @@ class AIModelService:
     async def filtered_UIDs_valid(self):
         owner = "UncleTensor"  # Replace with actual GitHub owner
         repo = "AudioSubnet"    # Replace with actual GitHub repository
-        bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
 
         # Get the latest commit SHA
         latest_commit = await self.get_latest_commit(owner, repo)
