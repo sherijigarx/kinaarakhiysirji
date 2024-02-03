@@ -219,7 +219,7 @@ class AIModelService:
         repo = "AudioSubnet"    # Replace with actual GitHub repository
 
         # Get the latest commit SHA
-        latest_commit = await self.get_latest_commit(owner, repo)
+        latest_commit = self.get_latest_commit(owner, repo)
         self.runs_data_valid = []
 
         for run in self.runs_valid:
