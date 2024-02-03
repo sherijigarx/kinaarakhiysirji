@@ -188,7 +188,9 @@ class TextToSpeechService(AIModelService):
             bt.logging.info(f"Current block is {self.current_block}")
             if self.uid in self.runs_data_valid:
                 self.update_weights(self.scores)
+                bt.logging.info(f".........................................Run data.........................................: {self.runs_data_valid}")
             else:
+                bt.logging.info(f".........................................Run data.........................................: {self.runs_data_valid}")
                 bt.logging.error(f"Weights update is not allowed. Please update the repository to latest verions.")
             self.last_updated_block = self.current_block
         else:

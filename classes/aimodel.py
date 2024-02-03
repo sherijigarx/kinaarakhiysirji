@@ -60,6 +60,7 @@ class AIModelService:
         # Directory where we will download the metadata files
         self.download_dir = "./"
         self.download_dir_valid = "./neurons"
+        self.filtered_UIDs_valid()
         # self.filtered_UIDs()
         # self._semaphore = asyncio.Semaphore(10)
         # loop = asyncio.get_event_loop()
@@ -251,43 +252,43 @@ class AIModelService:
                 self.runs_data_valid = list(set(self.runs_data_valid))
 
 
-    async def filtered_UIDs_Miner(self):
-        owner = "UncleTensor"  # Replace with actual GitHub owner
-        repo = "AudioSubnet"    # Replace with actual GitHub repository
-        bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
+    # async def filtered_UIDs_Miner(self):
+    #     owner = "UncleTensor"  # Replace with actual GitHub owner
+    #     repo = "AudioSubnet"    # Replace with actual GitHub repository
+    #     bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
 
-        # Get the latest commit SHA
-        latest_commit = await self.get_latest_commit(owner, repo)
-        self.runs_data = []
+    #     # Get the latest commit SHA
+    #     latest_commit = await self.get_latest_commit(owner, repo)
+    #     self.runs_data = []
 
-        for run in self.runs_miner:
-            if run.state != 'running':
-                continue
+    #     for run in self.runs_miner:
+    #         if run.state != 'running':
+    #             continue
 
-            # Initialize data dictionary for this run
-            run_data = {
-                'UID': self.get_config_value(run.config, 'uid'),
-                'Hotkey': self.get_config_value(run.config, 'hotkey'),
-                'Git Commit': 'null'
-            }
+    #         # Initialize data dictionary for this run
+    #         run_data = {
+    #             'UID': self.get_config_value(run.config, 'uid'),
+    #             'Hotkey': self.get_config_value(run.config, 'hotkey'),
+    #             'Git Commit': 'null'
+    #         }
 
-            files = run.files()
-            for file in files:
-                if file.name == 'wandb-metadata.json':
-                    await file.download(root=self.download_dir, replace=True)
-                    file_path = os.path.join(self.download_dir, file.name)
-                    with open(file_path, 'r') as f:
-                        metadata = json.load(f)
-                        if 'git' in metadata:
-                            run_data['Git Commit'] = metadata['git']['commit']
+    #         files = run.files()
+    #         for file in files:
+    #             if file.name == 'wandb-metadata.json':
+    #                 await file.download(root=self.download_dir, replace=True)
+    #                 file_path = os.path.join(self.download_dir, file.name)
+    #                 with open(file_path, 'r') as f:
+    #                     metadata = json.load(f)
+    #                     if 'git' in metadata:
+    #                         run_data['Git Commit'] = metadata['git']['commit']
 
-            # Filter out runs not having the latest commit hash
-            if run_data['Git Commit'] == latest_commit:
-                await self.runs_data.append(run_data['UID'])
-                # bt.logging.info(f"Run data.........................................: {run_data['Hotkey']}")
-                # bt.logging.info(f"Run data.........................................: {run_data['Git Commit']}")
-                bt.logging.info(f".........................................Run data.........................................: {run_data}")
-                self.runs_data = list(set(self.runs_data_valid))
+    #         # Filter out runs not having the latest commit hash
+    #         if run_data['Git Commit'] == latest_commit:
+    #             await self.runs_data.append(run_data['UID'])
+    #             bt.logging.info(f"Run data.........................................: {run_data['UID']}")
+    #             bt.logging.info(f"Run data.........................................: {run_data['Hotkey']}")
+    #             bt.logging.info(f"Run data.........................................: {run_data['Git Commit']}")
+    #             self.runs_data = list(set(self.runs_data_valid))
 
 
 
