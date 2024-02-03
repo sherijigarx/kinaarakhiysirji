@@ -16,7 +16,6 @@ import pandas as pd
 import sys
 import wandb
 import datetime as dt
-import subprocess
 
 # Set the project root path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -74,16 +73,6 @@ class TextToSpeechService(AIModelService):
             if self.wandb_run:
                 wandb.finish()  # End the current run
             self.new_wandb_run()  # Start a new run
-    
-    def get_git_commit_hash(self):
-        try:
-            # Run the git command to get the current commit hash
-            commit_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode('ascii').strip()
-            return commit_hash
-        except subprocess.CalledProcessError:
-            # If the git command fails, for example, if this is not a git repository
-            bt.logging.error("Failed to get git commit hash. '.git' folder is missing")
-            return None
     
     def new_wandb_run(self):
         now = dt.datetime.now()

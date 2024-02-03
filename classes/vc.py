@@ -18,7 +18,6 @@ import lib.protocol
 from lib.protocol import VoiceClone
 from lib.clone_score import CloneScore
 from classes.aimodel import AIModelService
-import subprocess
 
 
 # Set the project root path
@@ -83,17 +82,7 @@ class VoiceCloningService(AIModelService):
             if self.wandb_run:
                 wandb.finish()  # End the current run
             self.new_wandb_run()  # Start a new run
-   
-    def get_git_commit_hash(self):
-        try:
-            # Run the git command to get the current commit hash
-            commit_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode('ascii').strip()
-            return commit_hash
-        except subprocess.CalledProcessError:
-            # If the git command fails, for example, if this is not a git repository
-            bt.logging.error("Failed to get git commit hash. '.git' folder is missing")
-            return None
-    
+
     def new_wandb_run(self):
         now = dt.datetime.now()
         run_id = now.strftime("%Y-%m-%d_%H-%M-%S")
