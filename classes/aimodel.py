@@ -204,6 +204,7 @@ class AIModelService:
 
         if response.status_code == 200:
             commits = response.json()
+            bt.logging.info(f"......................................... Latest commit .........................................: {commits[0]['sha']}")
             return commits[0]['sha'] if commits else None
         else:
             bt.logging.error(f"Failed to fetch the latest commit: {response.status_code}")
