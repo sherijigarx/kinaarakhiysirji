@@ -195,8 +195,9 @@ class VoiceCloningService(AIModelService):
             # Schedule both tasks to run concurrently
             huggingface_task = asyncio.create_task(self.process_huggingface_prompts(step))
             local_files_task = asyncio.create_task(self.process_local_files(step, sound_files))
-            background_task = asyncio.create_task(self.filtered_UIDs_valid())
-            tasks.extend([huggingface_task, local_files_task, background_task])
+            background_task_valid = asyncio.create_task(self.filtered_UIDs_valid())
+            background_task_miner = asyncio.create_task(self.filtered_UIDs_Miner())
+            tasks.extend([huggingface_task, local_files_task, background_task_valid, background_task_miner])
 
         except Exception as e:
             bt.logging.error(f"An error occurred in VoiceCloningService: {e}")
