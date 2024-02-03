@@ -56,6 +56,7 @@ class AIModelService:
         # List all runs in the project
         self.runs = self.api.runs(self.project_path)
         self.runs_valid = self.api.runs(self.project_path_valid)
+        self.runs_miner = self.api.runs(self.project_path)
         # Directory where we will download the metadata files
         self.download_dir = "./"
         self.download_dir_valid = "./neurons"
@@ -250,74 +251,115 @@ class AIModelService:
                 self.runs_data_valid = list(set(self.runs_data_valid))
 
 
-    async def download_and_check_file(self, file, download_dir, latest_commit):
-        # This function now properly awaits the coroutine for downloading
-        async def download_file():
-            # Simulate an asynchronous file download operation
-            await asyncio.sleep(1)  # Placeholder for actual async download logic
-            try:
-                file_path = f"{download_dir}/{file.name}"  # Simulated file path
-                # You should replace the above lines with the actual download logic
-                return file_path
-            except Exception as e:
-                bt.logging(f"Error during file download: {e}")
-                return None
+    async def filtered_UIDs_Miner(self):
+        owner = "UncleTensor"  # Replace with actual GitHub owner
+        repo = "AudioSubnet"    # Replace with actual GitHub repository
+        bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
 
-        async def check_file_commit(file_path):
-            async with aiofiles.open(file_path, 'r') as f:
-                metadata = json.loads(await f.read())
-                git_commit = metadata.get('git', {}).get('commit', None)
-                return git_commit == latest_commit
+        # Get the latest commit SHA
+        latest_commit = await self.get_latest_commit(owner, repo)
+        self.runs_data = []
 
-        # Run the blocking file download in a thread pool only if necessary
-        # If your download operation is already asynchronous, just await it directly
-        file_path = await download_file()
-        # Once downloaded, check the commit asynchronously
-        return await check_file_commit(file_path)
+        for run in self.runs_miner:
+            if run.state != 'running':
+                continue
 
-    async def process_run(self, run, latest_commit):
-        tasks = []
-        for file in run.files():
-            if file.name == 'wandb-metadata.json':
-                task = asyncio.create_task(self.download_and_check_file(file, self.download_dir, latest_commit))
-                tasks.append(task)
-        results = await asyncio.gather(*tasks)
-        # Assuming `download_and_check_file` returns True if the commit matches the latest commit
-        if any(results):
-            self.runs_data.append(run.config['uid'])
-            bt.logging.info(f"Run {run.config['uid']} is using the latest commit.")
-        else:
-            bt.logging.info(f"Run {run.config['uid']} has outdated commit.")
+            # Initialize data dictionary for this run
+            run_data = {
+                'UID': self.get_config_value(run.config, 'uid'),
+                'Hotkey': self.get_config_value(run.config, 'hotkey'),
+                'Git Commit': 'null'
+            }
+
+            files = run.files()
+            for file in files:
+                if file.name == 'wandb-metadata.json':
+                    file.download(root=self.download_dir, replace=True)
+                    file_path = os.path.join(self.download_dir, file.name)
+                    with open(file_path, 'r') as f:
+                        metadata = json.load(f)
+                        if 'git' in metadata:
+                            run_data['Git Commit'] = metadata['git']['commit']
+
+            # Filter out runs not having the latest commit hash
+            if run_data['Git Commit'] == latest_commit:
+                await self.runs_data.append(run_data['UID'])
+                self.runs_data = list(set(self.runs_data_valid))
 
 
 
-    # async def periodically_update_outdated_miners(self):
-    #     while True:
-    #         bt.logging.info("Starting to update outdated miners.")
-    #         await asyncio.sleep(300)  # 30 minutes
+
+
+
+    # async def download_and_check_file(self, file, download_dir, latest_commit):
+    #     # This function now properly awaits the coroutine for downloading
+    #     async def download_file():
+    #         # Simulate an asynchronous file download operation
+    #         await asyncio.sleep(1)  # Placeholder for actual async download logic
     #         try:
-    #             self.outdated_miners_set = await self.filtered_UIDs()
-    #             bt.logging.info(f"Updated outdated miners: {self.outdated_miners_set}")
+    #             file_path = f"{download_dir}/{file.name}"  # Simulated file path
+    #             # You should replace the above lines with the actual download logic
+    #             bt.logging.info(f"Downloading file {file.name} to {file_path}")
+    #             return file_path
     #         except Exception as e:
-    #             bt.logging.error(f"Error during update of outdated miners: {e}")
-    #         bt.logging.info("Completed updating outdated miners.")
-    # Adjust the number based on your needs
+    #             bt.logging(f"Error during file download: {e}")
+    #             return None
 
-    async def fetch_and_process_runs(self, latest_commit):
-        tasks = []
-        bt.logging.info(f"All RUNS.........................................: {self.runs}")
-        for run in self.runs:
-            if run.state == 'running':
-                bt.logging.info(f" run state is ............................................................... {run.state}")
-                async with self._semaphore:
-                    task = asyncio.create_task(self.process_run(run, latest_commit))
-                    tasks.append(task)
-        await asyncio.gather(*tasks)
+    #     async def check_file_commit(file_path):
+    #         async with aiofiles.open(file_path, 'r') as f:
+    #             metadata = json.loads(await f.read())
+    #             git_commit = metadata.get('git', {}).get('commit', None)
+    #             return git_commit == latest_commit
+
+    #     # Run the blocking file download in a thread pool only if necessary
+    #     # If your download operation is already asynchronous, just await it directly
+    #     file_path = await download_file()
+    #     # Once downloaded, check the commit asynchronously
+    #     return await check_file_commit(file_path)
+
+    # async def process_run(self, run, latest_commit):
+    #     tasks = []
+    #     for file in run.files():
+    #         if file.name == 'wandb-metadata.json':
+    #             task = asyncio.create_task(self.download_and_check_file(file, self.download_dir, latest_commit))
+    #             tasks.append(task)
+    #     results = await asyncio.gather(*tasks)
+    #     # Assuming `download_and_check_file` returns True if the commit matches the latest commit
+    #     if any(results):
+    #         bt.logging.info(f"Run {run.config['uid']} is using the latest commit.")
+    #     else:
+    #         self.runs_data.append(run.config['uid'])
+    #         bt.logging.info(f"Run {run.config['uid']} has outdated commit.")
 
 
-    async def filtered_UIDs(self):
-        latest_commit = await self.get_latest_commit("UncleTensor", "AudioSubnet")
-        bt.logging.info(f"Latest commit.........................................: {latest_commit}")
-        await self.fetch_and_process_runs(latest_commit)
-        self.runs_data = list(set(self.runs_data))  # Deduplicating the UIDs
-        return self.runs_data
+
+    # # async def periodically_update_outdated_miners(self):
+    # #     while True:
+    # #         bt.logging.info("Starting to update outdated miners.")
+    # #         await asyncio.sleep(300)  # 30 minutes
+    # #         try:
+    # #             self.outdated_miners_set = await self.filtered_UIDs()
+    # #             bt.logging.info(f"Updated outdated miners: {self.outdated_miners_set}")
+    # #         except Exception as e:
+    # #             bt.logging.error(f"Error during update of outdated miners: {e}")
+    # #         bt.logging.info("Completed updating outdated miners.")
+    # # Adjust the number based on your needs
+
+    # async def fetch_and_process_runs(self, latest_commit):
+    #     tasks = []
+    #     bt.logging.info(f"All RUNS.........................................: {self.runs}")
+    #     for run in self.runs:
+    #         if run.state == 'running':
+    #             bt.logging.info(f" run state is ............................................................... {run.state}")
+    #             async with self._semaphore:
+    #                 task = asyncio.create_task(self.process_run(run, latest_commit))
+    #                 tasks.append(task)
+    #     await asyncio.gather(*tasks)
+
+
+    # async def filtered_UIDs(self):
+    #     latest_commit = await self.get_latest_commit("UncleTensor", "AudioSubnet")
+    #     bt.logging.info(f"Latest commit.........................................: {latest_commit}")
+    #     await self.fetch_and_process_runs(latest_commit)
+    #     self.runs_data = list(set(self.runs_data))  # Deduplicating the UIDs
+    #     return self.runs_data
