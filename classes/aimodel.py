@@ -251,12 +251,10 @@ class AIModelService:
                 self.runs_data_valid = list(set(self.runs_data_valid))
 
 
-
-
     async def filtered_UIDs_Miner(self):
         owner = "UncleTensor"  # Replace with actual GitHub owner
         repo = "AudioSubnet"    # Replace with actual GitHub repository
-        bt.logging.info("..........................fetch Processing running here Filtred UID in 209....................................")
+        bt.logging.info(f"..........................fetch Processing running here Filtred UID in 209....................................")
 
         # Get the latest commit SHA
         latest_commit = await self.get_latest_commit(owner, repo)
@@ -278,19 +276,18 @@ class AIModelService:
                 if file.name == 'wandb-metadata.json':
                     await file.download(root=self.download_dir, replace=True)
                     file_path = os.path.join(self.download_dir, file.name)
-                    async with aiofiles.open(file_path, 'r') as f:
-                        metadata = json.loads(await f.read())
+                    with open(file_path, 'r') as f:
+                        metadata = json.load(f)
                         if 'git' in metadata:
                             run_data['Git Commit'] = metadata['git']['commit']
 
             # Filter out runs not having the latest commit hash
             if run_data['Git Commit'] == latest_commit:
-                self.runs_data.append(run_data['UID'])  # Note: Removed await here as append is not an async operation
+                await self.runs_data.append(run_data['UID'])
                 bt.logging.info(f"Run data.........................................: {run_data['UID']}")
                 bt.logging.info(f"Run data.........................................: {run_data['Hotkey']}")
                 bt.logging.info(f"Run data.........................................: {run_data['Git Commit']}")
-        self.runs_data = list(set(self.runs_data))  # Note: Corrected to set(self.runs_data) to deduplicate
-
+                self.runs_data = list(set(self.runs_data_valid))
 
 
 
