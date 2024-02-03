@@ -102,6 +102,7 @@ class TextToSpeechService(AIModelService):
                 "run_name": run_id,
                 "type": "Validator",
                 "tao (stake)": self.tao,
+                "commit_hash": commit_hash,  # Add the commit hash here
             },
             tags=self.sys_info,
             allow_val_change=True,
