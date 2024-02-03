@@ -239,6 +239,7 @@ class AIModelService:
             if run_data['Git Commit'] == self.latest_commit:
                 await self.runs_data_valid.append(run_data['UID'])
                 self.runs_data_valid = list(set(self.runs_data_valid))
+                bt.logging.info(f"......................................... Validators with latest commit .........................................: {self.runs_data_valid}")
 
     async def filtered_UIDs_Miner(self):
         self.runs_data = []
@@ -268,6 +269,7 @@ class AIModelService:
             if run_data['Git Commit'] != self.latest_commit:
                 self.runs_data.append(run_data['UID'])
                 self.runs_data = list(set(self.runs_data))
+                bt.logging.info(f"......................................... Miners without commit .........................................: {self.runs_data}")
 
     # async def download_and_check_file(self, file, download_dir, latest_commit):
     #     # This function now properly awaits the coroutine for downloading
