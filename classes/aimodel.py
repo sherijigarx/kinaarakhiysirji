@@ -38,6 +38,7 @@ class AIModelService:
         self.setup_subtensor()
         self.setup_dendrite()
         self.setup_metagraph()
+        self.get_latest_commit()
         self.vcdnp = self.config.vcdnp
         self.max_mse = self.config.max_mse
         if AIModelService._scores is None:
@@ -243,7 +244,7 @@ class AIModelService:
             if run_data['Git Commit'] == self.latest_commit:
                 await self.runs_data_valid.append(run_data['UID'])
                 self.runs_data_valid = list(set(self.runs_data_valid))
-                bt.logging.info(f".........................................Run data.........................................: {self.runs_data_valid}")
+                bt.logging.info(f"......................................... Run data .........................................: {self.runs_data_valid}")
 
     # async def filtered_UIDs_Miner(self):
     #     owner = "UncleTensor"  # Replace with actual GitHub owner
